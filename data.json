@@ -1,0 +1,20 @@
+{
+  "courses": [
+    {
+      "id": "crs-1",
+      "name": "Arsitektur Komputer",
+      "meetings": [
+        {
+          "id": "mtg-1",
+          "title": "Pertemuan 1 - Konsep Dasar",
+          "isCompleted": true
+        },
+        {
+          "id": "mtg-2",
+          "title": "Pertemuan 2 - Bus Sistem",
+          "isCompleted": false
+        }
+      ]
+    }
+  ]
+}

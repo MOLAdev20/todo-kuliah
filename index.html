@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manajemen Kuliah</title>
+    <style>
+      :root {
+        --bg: #f8f9fa;
+        --card-bg: #ffffff;
+        --text: #212529;
+        --text-muted: #6c757d;
+        --border: #e9ecef;
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --danger: #dc2626;
+        --danger-hover: #b91c1c;
+        --radius: 8px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        padding: 40px 20px;
+        line-height: 1.5;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+      .header-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      input[type="text"] {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: var(--radius);
+        font-size: 0.95rem;
+        outline: none;
+      }
+      input[type="text"]:focus {
+        border-color: var(--primary);
+      }
+
+      button {
+        padding: 8px 14px;
+        border-radius: var(--radius);
+        border: none;
+        background: var(--primary);
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 0.88rem;
+        transition: background 0.2s;
+      }
+      button:hover {
+        background: var(--primary-hover);
+      }
+      button.btn-outline {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid #cbd5e1;
+      }
+      button.btn-outline:hover {
+        background: #f1f5f9;
+      }
+      button.btn-danger {
+        background: var(--danger);
+      }
+      button.btn-danger:hover {
+        background: var(--danger-hover);
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .form-inline {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+
+      .item-title {
+        cursor: pointer;
+        flex: 1;
+        font-weight: 500;
+      }
+      .item-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .action-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 4px 8px;
+        font-size: 0.85rem;
+      }
+      .action-btn:hover {
+        color: var(--text);
+      }
+      .action-btn.delete:hover {
+        color: var(--danger);
+      }
+
+      .meeting-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+      }
+      .meeting-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+      .meeting-item.completed .meeting-title {
+        text-decoration: line-through;
+        color: var(--text-muted);
+      }
+
+      .nav-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .nav-header h2 {
+        font-size: 1.25rem;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 30px 0;
+        font-size: 0.95rem;
+      }
+      .badge-count {
+        font-size: 0.75rem;
+        background: #e2e8f0;
+        padding: 2px 8px;
+        border-radius: 12px;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>📚 Manajemen Kuliah</h1>
+        <div class="header-actions">
+          <button
+            id="btnExport"
+            class="btn-outline"
+            title="Export data ke file .json"
+          >
+            💾 Backup .JSON
+          </button>
+          <button
+            id="btnReset"
+            class="btn-outline"
+            title="Reset data ke data.json awal"
+          >
+            🔄 Reset Data
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW MATA KULIAH -->
+      <div id="courseView">
+        <div class="card">
+          <form id="formAddCourse" class="form-inline">
+            <input
+              type="text"
+              id="inputCourseName"
+              placeholder="Tambah mata kuliah baru..."
+              required
+            />
+            <button type="submit">Tambah</button>
+          </form>
+        </div>
+
+        <ul id="courseList" class="list"></ul>
+      </div>
+
+      <!-- VIEW DETAIL PERTEMUAN -->
+      <div id="meetingView" style="display: none">
+        <div class="nav-header">
+          <button id="btnBackToCourses" class="btn-outline">← Kembali</button>
+          <h2 id="currentCourseTitle">Detail Mata Kuliah</h2>
+        </div>
+
+        <div class="card">
+          <form id="formAddMeeting" class="form-inline">
+            <input
+              type="text"
+              id="inputMeetingTitle"
+              placeholder="Tambah pertemuan (misal: Pertemuan 1)..."
+              required
+            />
+            <button type="submit">Tambah</button>
+          </form>
+        </div>
+
+        <ul id="meetingList" class="list"></ul>
+      </div>
+    </div>
+
+    <script>
+      let appData = { courses: [] };
+      let selectedCourseId = null;
+
+      const courseView = document.getElementById("courseView");
+      const meetingView = document.getElementById("meetingView");
+
+      const formAddCourse = document.getElementById("formAddCourse");
+      const inputCourseName = document.getElementById("inputCourseName");
+      const courseList = document.getElementById("courseList");
+
+      const formAddMeeting = document.getElementById("formAddMeeting");
+      const inputMeetingTitle = document.getElementById("inputMeetingTitle");
+      const meetingList = document.getElementById("meetingList");
+      const currentCourseTitle = document.getElementById("currentCourseTitle");
+
+      const btnBackToCourses = document.getElementById("btnBackToCourses");
+      const btnExport = document.getElementById("btnExport");
+      const btnReset = document.getElementById("btnReset");
+
+      // --- INISIALISASI & FETCH DATA.JSON ---
+      async function initApp() {
+        const savedData = localStorage.getItem("kuliah_app_data");
+
+        if (savedData) {
+          try {
+            appData = JSON.parse(savedData);
+          } catch (e) {
+            await fetchInitialJSON();
+          }
+        } else {
+          await fetchInitialJSON();
+        }
+
+        renderCourses();
+      }
+
+      // Ambil data.json dari server Vercel
+      async function fetchInitialJSON() {
+        try {
+          const response = await fetch("./data.json");
+          if (!response.ok) throw new Error("Network error");
+          appData = await response.json();
+          saveData();
+        } catch (err) {
+          console.warn(
+            "Gagal fetch data.json, menggunakan struktur kosong:",
+            err,
+          );
+          appData = { courses: [] };
+          saveData();
+        }
+      }
+
+      function saveData() {
+        localStorage.setItem("kuliah_app_data", JSON.stringify(appData));
+      }
+
+      // Export Backup .JSON
+      btnExport.onclick = () => {
+        const dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(JSON.stringify(appData, null, 2));
+        const downloadAnchor = document.createElement("a");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute(
+          "download",
+          `backup-kuliah-${Date.now()}.json`,
+        );
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+      };
+
+      // Reset ke data.json awal dari server
+      btnReset.onclick = async () => {
+        if (
+          confirm(
+            "Reset semua data ke data awal dari server data.json? Perubahan lokal akan hilang.",
+          )
+        ) {
+          localStorage.removeItem("kuliah_app_data");
+          await fetchInitialJSON();
+          renderCourses();
+        }
+      };
+
+      // --- LOGIKA MATA KULIAH ---
+
+      function renderCourses() {
+        courseList.innerHTML = "";
+
+        if (!appData.courses || appData.courses.length === 0) {
+          courseList.innerHTML =
+            '<div class="empty-state">Belum ada mata kuliah. Silakan tambah di atas.</div>';
+          return;
+        }
+
+        appData.courses.forEach((course) => {
+          const meetingCount = course.meetings ? course.meetings.length : 0;
+          const canDelete = meetingCount === 0;
+
+          const li = document.createElement("li");
+          li.className = "list-item";
+          li.innerHTML = `
+          <div class="item-title" onclick="openMeetingView('${course.id}')">
+            ${escapeHtml(course.name)} <span class="badge-count">${meetingCount} pertemuan</span>
+          </div>
+          <div class="item-actions">
+            <button class="action-btn" onclick="editCourse('${course.id}')">Edit</button>
+            <button class="action-btn delete" onclick="deleteCourse('${course.id}')" ${!canDelete ? 'disabled title="Hapus semua pertemuan terlebih dahulu"' : ""}>Hapus</button>
+          </div>
+        `;
+          courseList.appendChild(li);
+        });
+      }
+
+      formAddCourse.onsubmit = (e) => {
+        e.preventDefault();
+        const name = inputCourseName.value.trim();
+        if (!name) return;
+
+        if (!appData.courses) appData.courses = [];
+        appData.courses.push({
+          id: "crs-" + Date.now(),
+          name: name,
+          meetings: [],
+        });
+
+        inputCourseName.value = "";
+        saveData();
+        renderCourses();
+      };
+
+      window.editCourse = (id) => {
+        const course = appData.courses.find((c) => c.id === id);
+        if (!course) return;
+
+        const newName = prompt("Edit nama mata kuliah:", course.name);
+        if (newName && newName.trim() !== "") {
+          course.name = newName.trim();
+          saveData();
+          renderCourses();
+          if (selectedCourseId === id)
+            currentCourseTitle.textContent = course.name;
+        }
+      };
+
+      window.deleteCourse = (id) => {
+        const course = appData.courses.find((c) => c.id === id);
+        if (!course) return;
+
+        if (course.meetings && course.meetings.length > 0) {
+          alert(
+            "Mata kuliah tidak bisa dihapus karena masih memiliki pertemuan!",
+          );
+          return;
+        }
+
+        if (confirm(`Yakin ingin menghapus mata kuliah "${course.name}"?`)) {
+          appData.courses = appData.courses.filter((c) => c.id !== id);
+          saveData();
+          renderCourses();
+        }
+      };
+
+      // --- LOGIKA PERTEMUAN ---
+
+      window.openMeetingView = (courseId) => {
+        selectedCourseId = courseId;
+        const course = appData.courses.find((c) => c.id === courseId);
+        if (!course) return;
+
+        currentCourseTitle.textContent = course.name;
+        courseView.style.display = "none";
+        meetingView.style.display = "block";
+
+        renderMeetings();
+      };
+
+      btnBackToCourses.onclick = () => {
+        selectedCourseId = null;
+        meetingView.style.display = "none";
+        courseView.style.display = "block";
+        renderCourses();
+      };
+
+      function renderMeetings() {
+        meetingList.innerHTML = "";
+        const course = appData.courses.find((c) => c.id === selectedCourseId);
+        if (!course) return;
+
+        if (!course.meetings || course.meetings.length === 0) {
+          meetingList.innerHTML =
+            '<div class="empty-state">Belum ada pertemuan di mata kuliah ini.</div>';
+          return;
+        }
+
+        course.meetings.forEach((meeting) => {
+          const li = document.createElement("li");
+          li.className = "list-item";
+          li.innerHTML = `
+          <div class="meeting-item ${meeting.isCompleted ? "completed" : ""}">
+            <input type="checkbox" ${meeting.isCompleted ? "checked" : ""} onchange="toggleMeeting('${meeting.id}')">
+            <span class="item-title meeting-title" onclick="toggleMeeting('${meeting.id}')">${escapeHtml(meeting.title)}</span>
+          </div>
+          <div class="item-actions">
+            <button class="action-btn" onclick="editMeeting('${meeting.id}')">Edit</button>
+            <button class="action-btn delete" onclick="deleteMeeting('${meeting.id}')">Hapus</button>
+          </div>
+        `;
+          meetingList.appendChild(li);
+        });
+      }
+
+      formAddMeeting.onsubmit = (e) => {
+        e.preventDefault();
+        const title = inputMeetingTitle.value.trim();
+        if (!title || !selectedCourseId) return;
+
+        const course = appData.courses.find((c) => c.id === selectedCourseId);
+        if (!course.meetings) course.meetings = [];
+
+        course.meetings.push({
+          id: "mtg-" + Date.now(),
+          title: title,
+          isCompleted: false,
+        });
+
+        inputMeetingTitle.value = "";
+        saveData();
+        renderMeetings();
+      };
+
+      window.toggleMeeting = (meetingId) => {
+        const course = appData.courses.find((c) => c.id === selectedCourseId);
+        const meeting = course.meetings.find((m) => m.id === meetingId);
+        if (!meeting) return;
+
+        meeting.isCompleted = !meeting.isCompleted;
+        saveData();
+        renderMeetings();
+      };
+
+      window.editMeeting = (meetingId) => {
+        const course = appData.courses.find((c) => c.id === selectedCourseId);
+        const meeting = course.meetings.find((m) => m.id === meetingId);
+        if (!meeting) return;
+
+        const newTitle = prompt("Edit nama/judul pertemuan:", meeting.title);
+        if (newTitle && newTitle.trim() !== "") {
+          meeting.title = newTitle.trim();
+          saveData();
+          renderMeetings();
+        }
+      };
+
+      window.deleteMeeting = (meetingId) => {
+        const course = appData.courses.find((c) => c.id === selectedCourseId);
+        const meeting = course.meetings.find((m) => m.id === meetingId);
+        if (!meeting) return;
+
+        if (confirm(`Yakin ingin menghapus "${meeting.title}"?`)) {
+          course.meetings = course.meetings.filter((m) => m.id !== meetingId);
+          saveData();
+          renderMeetings();
+        }
+      };
+
+      function escapeHtml(str) {
+        return str.replace(
+          /[&<>"']/g,
+          (match) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[match],
+        );
+      }
+
+      initApp();
+    </script>
+  </body>
+</html>
