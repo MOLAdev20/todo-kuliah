@@ -1,18 +1,25 @@
 {
-  "courses": [
+  "journals": [
     {
-      "id": "crs-1",
-      "name": "Arsitektur Komputer",
-      "meetings": [
+      "id": "jrn-1710000000000",
+      "date": "2026-09-04",
+      "title": "Jurnal Semester 7 - Minggu 1",
+      "courses": [
         {
-          "id": "mtg-1",
-          "title": "Pertemuan 1 - Konsep Dasar",
-          "isCompleted": true
-        },
-        {
-          "id": "mtg-2",
-          "title": "Pertemuan 2 - Bus Sistem",
-          "isCompleted": false
+          "id": "crs-1710000000001",
+          "name": "Arsitektur Komputer",
+          "meetings": [
+            {
+              "id": "mtg-1",
+              "title": "Pertemuan 1 - Konsep Dasar",
+              "isCompleted": true
+            },
+            {
+              "id": "mtg-2",
+              "title": "Pertemuan 2 - Bus Sistem",
+              "isCompleted": true
+            }
+          ]
         }
       ]
     }

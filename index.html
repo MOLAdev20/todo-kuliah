@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manajemen Kuliah</title>
+    <title>Manajemen Jurnal Kuliah</title>
     <style>
       :root {
         --bg: #f8f9fa;
@@ -13,6 +13,7 @@
         --border: #e9ecef;
         --primary: #2563eb;
         --primary-hover: #1d4ed8;
+        --success: #16a34a;
         --danger: #dc2626;
         --danger-hover: #b91c1c;
         --radius: 8px;
@@ -34,7 +35,7 @@
         line-height: 1.5;
       }
       .container {
-        max-width: 720px;
+        max-width: 760px;
         margin: 0 auto;
       }
 
@@ -57,20 +58,21 @@
         background: var(--card-bg);
         border-radius: var(--radius);
         border: 1px solid var(--border);
-        padding: 24px;
+        padding: 20px;
         margin-bottom: 20px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       }
 
-      input[type="text"] {
-        flex: 1;
+      input[type="text"],
+      input[type="date"] {
         padding: 10px 14px;
         border: 1px solid #cbd5e1;
         border-radius: var(--radius);
         font-size: 0.95rem;
         outline: none;
       }
-      input[type="text"]:focus {
+      input[type="text"]:focus,
+      input[type="date"]:focus {
         border-color: var(--primary);
       }
 
@@ -102,41 +104,53 @@
       button.btn-danger:hover {
         background: var(--danger-hover);
       }
-      button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
 
+      .form-journal {
+        display: grid;
+        grid-template-columns: 160px 1fr auto;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
       .form-inline {
         display: flex;
         gap: 10px;
-        margin-bottom: 20px;
       }
 
       .list {
         list-style: none;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
       }
       .list-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 16px;
+        padding: 16px;
         background: var(--card-bg);
         border: 1px solid var(--border);
         border-radius: var(--radius);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
 
-      .item-title {
+      .item-info {
         cursor: pointer;
         flex: 1;
-        font-weight: 500;
       }
+      .item-date {
+        font-size: 0.8rem;
+        color: var(--primary);
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+      .item-title {
+        font-weight: 600;
+        font-size: 1.05rem;
+      }
+
       .item-actions {
         display: flex;
-        gap: 8px;
+        gap: 6px;
         align-items: center;
       }
       .action-btn {
@@ -154,30 +168,136 @@
         color: var(--danger);
       }
 
-      .meeting-item {
+      /* NAVBAR TREE VIEW & MODE SWITCH */
+      .nav-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .nav-left {
         display: flex;
         align-items: center;
         gap: 12px;
-        flex: 1;
       }
-      .meeting-item input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
+
+      .mode-switch-box {
+        display: flex;
+        align-items: center;
+        background: #e2e8f0;
+        padding: 3px;
+        border-radius: 20px;
+        gap: 2px;
+      }
+      .mode-btn {
+        padding: 6px 14px;
+        border-radius: 16px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: transparent;
+        color: var(--text-muted);
         cursor: pointer;
+        border: none;
+        transition: all 0.2s;
       }
-      .meeting-item.completed .meeting-title {
+      .mode-btn.active {
+        background: white;
+        color: var(--primary);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      /* TREE VIEW STRUCTURE */
+      .course-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .course-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .course-title-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .course-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+      .course-name.all-completed {
         text-decoration: line-through;
         color: var(--text-muted);
       }
 
-      .nav-header {
+      .badge-status {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+        background: #f1f5f9;
+        color: var(--text-muted);
+      }
+      .badge-status.completed {
+        background: #dcfce7;
+        color: var(--success);
+      }
+
+      .meetings-tree {
+        margin-left: 20px;
+        padding-left: 14px;
+        border-left: 2px dashed #cbd5e1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .meeting-row {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: #f8fafc;
+        border-radius: var(--radius);
+        border: 1px solid #f1f5f9;
       }
-      .nav-header h2 {
-        font-size: 1.25rem;
+      .meeting-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+      }
+      .meeting-left input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+      }
+      .meeting-text {
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+      .meeting-text.completed {
+        text-decoration: line-through;
+        color: var(--text-muted);
+      }
+
+      .add-meeting-box {
+        margin-top: 10px;
+        margin-left: 20px;
+        display: flex;
+        gap: 8px;
+      }
+      .add-meeting-box input {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+      }
+
+      /* CONTROL HIDE/SHOW SESUAI MODE */
+      body.mode-view .edit-only {
+        display: none !important;
       }
 
       .empty-state {
@@ -186,101 +306,144 @@
         padding: 30px 0;
         font-size: 0.95rem;
       }
-      .badge-count {
-        font-size: 0.75rem;
-        background: #e2e8f0;
-        padding: 2px 8px;
-        border-radius: 12px;
-        color: var(--text-muted);
-      }
     </style>
   </head>
-  <body>
+  <body class="mode-view">
+    <!-- DEFAULT MODE: VIEW -->
+
     <div class="container">
       <header>
-        <h1>📚 Manajemen Kuliah</h1>
+        <h1>📚 Jurnal Kuliah</h1>
         <div class="header-actions">
           <button
             id="btnExport"
             class="btn-outline"
-            title="Export data ke file .json"
+            title="Backup ke file .json"
           >
             💾 Backup .JSON
           </button>
-          <button
-            id="btnReset"
-            class="btn-outline"
-            title="Reset data ke data.json awal"
-          >
-            🔄 Reset Data
+          <button id="btnReset" class="btn-outline" title="Reset Data">
+            🔄 Reset
           </button>
         </div>
       </header>
 
-      <!-- VIEW MATA KULIAH -->
-      <div id="courseView">
+      <!-- VIEW 1: MASTER LIST JURNAL -->
+      <div id="journalView">
         <div class="card">
+          <form id="formAddJournal" class="form-journal">
+            <input type="date" id="inputJournalDate" required />
+            <input
+              type="text"
+              id="inputJournalTitle"
+              placeholder="Judul Jurnal / Sesi (misal: Sesi Minggu 1)..."
+              required
+            />
+            <button type="submit">Tambah Jurnal</button>
+          </form>
+        </div>
+
+        <ul id="journalList" class="list"></ul>
+      </div>
+
+      <!-- VIEW 2: TREE VIEW MATKUL & PERTEMUAN -->
+      <div id="treeView" style="display: none">
+        <div class="nav-header">
+          <div class="nav-left">
+            <button id="btnBackToJournals" class="btn-outline">
+              ← Kembali
+            </button>
+            <div>
+              <div id="selectedJournalDate" class="item-date"></div>
+              <h2 id="selectedJournalTitle">Detail Jurnal</h2>
+            </div>
+          </div>
+
+          <!-- SWITCH MODE BUTTON -->
+          <div class="mode-switch-box">
+            <button
+              id="btnModeView"
+              class="mode-btn active"
+              onclick="switchMode('view')"
+            >
+              👁️ View
+            </button>
+            <button
+              id="btnModeEdit"
+              class="mode-btn"
+              onclick="switchMode('edit')"
+            >
+              ✏️ Edit
+            </button>
+          </div>
+        </div>
+
+        <!-- FORM TAMBAH MATKUL (Hanya Muncul Saat Mode Edit) -->
+        <div class="card edit-only">
           <form id="formAddCourse" class="form-inline">
             <input
               type="text"
               id="inputCourseName"
-              placeholder="Tambah mata kuliah baru..."
+              placeholder="Tambah Mata Kuliah baru..."
               required
             />
-            <button type="submit">Tambah</button>
+            <button type="submit">Tambah Matkul</button>
           </form>
         </div>
 
-        <ul id="courseList" class="list"></ul>
-      </div>
-
-      <!-- VIEW DETAIL PERTEMUAN -->
-      <div id="meetingView" style="display: none">
-        <div class="nav-header">
-          <button id="btnBackToCourses" class="btn-outline">← Kembali</button>
-          <h2 id="currentCourseTitle">Detail Mata Kuliah</h2>
-        </div>
-
-        <div class="card">
-          <form id="formAddMeeting" class="form-inline">
-            <input
-              type="text"
-              id="inputMeetingTitle"
-              placeholder="Tambah pertemuan (misal: Pertemuan 1)..."
-              required
-            />
-            <button type="submit">Tambah</button>
-          </form>
-        </div>
-
-        <ul id="meetingList" class="list"></ul>
+        <div id="coursesContainer"></div>
       </div>
     </div>
 
     <script>
-      let appData = { courses: [] };
-      let selectedCourseId = null;
+      let appData = { journals: [] };
+      let selectedJournalId = null;
+      let currentMode = "view"; // 'view' atau 'edit'
 
-      const courseView = document.getElementById("courseView");
-      const meetingView = document.getElementById("meetingView");
+      // DOM Elements
+      const journalView = document.getElementById("journalView");
+      const treeView = document.getElementById("treeView");
+      const formAddJournal = document.getElementById("formAddJournal");
+      const inputJournalDate = document.getElementById("inputJournalDate");
+      const inputJournalTitle = document.getElementById("inputJournalTitle");
+      const journalList = document.getElementById("journalList");
 
+      const btnBackToJournals = document.getElementById("btnBackToJournals");
+      const selectedJournalDate = document.getElementById(
+        "selectedJournalDate",
+      );
+      const selectedJournalTitle = document.getElementById(
+        "selectedJournalTitle",
+      );
       const formAddCourse = document.getElementById("formAddCourse");
       const inputCourseName = document.getElementById("inputCourseName");
-      const courseList = document.getElementById("courseList");
+      const coursesContainer = document.getElementById("coursesContainer");
 
-      const formAddMeeting = document.getElementById("formAddMeeting");
-      const inputMeetingTitle = document.getElementById("inputMeetingTitle");
-      const meetingList = document.getElementById("meetingList");
-      const currentCourseTitle = document.getElementById("currentCourseTitle");
+      const btnModeView = document.getElementById("btnModeView");
+      const btnModeEdit = document.getElementById("btnModeEdit");
 
-      const btnBackToCourses = document.getElementById("btnBackToCourses");
       const btnExport = document.getElementById("btnExport");
       const btnReset = document.getElementById("btnReset");
 
-      // --- INISIALISASI & FETCH DATA.JSON ---
-      async function initApp() {
-        const savedData = localStorage.getItem("kuliah_app_data");
+      inputJournalDate.valueAsDate = new Date();
 
+      // FUNCTION SWITCH MODE VIEW / EDIT
+      window.switchMode = (mode) => {
+        currentMode = mode;
+        if (mode === "view") {
+          document.body.classList.add("mode-view");
+          btnModeView.classList.add("active");
+          btnModeEdit.classList.remove("active");
+        } else {
+          document.body.classList.remove("mode-view");
+          btnModeEdit.classList.add("active");
+          btnModeView.classList.remove("active");
+        }
+      };
+
+      // INIT APP
+      async function initApp() {
+        const savedData = localStorage.getItem("kuliah_tree_app_data");
         if (savedData) {
           try {
             appData = JSON.parse(savedData);
@@ -290,32 +453,293 @@
         } else {
           await fetchInitialJSON();
         }
-
-        renderCourses();
+        renderJournals();
       }
 
-      // Ambil data.json dari server Vercel
       async function fetchInitialJSON() {
         try {
           const response = await fetch("./data.json");
-          if (!response.ok) throw new Error("Network error");
+          if (!response.ok) throw new Error();
           appData = await response.json();
           saveData();
         } catch (err) {
-          console.warn(
-            "Gagal fetch data.json, menggunakan struktur kosong:",
-            err,
-          );
-          appData = { courses: [] };
+          appData = { journals: [] };
           saveData();
         }
       }
 
       function saveData() {
-        localStorage.setItem("kuliah_app_data", JSON.stringify(appData));
+        localStorage.setItem("kuliah_tree_app_data", JSON.stringify(appData));
       }
 
-      // Export Backup .JSON
+      // MASTER LIST JURNAL
+      function renderJournals() {
+        journalList.innerHTML = "";
+        if (!appData.journals || appData.journals.length === 0) {
+          journalList.innerHTML =
+            '<div class="empty-state">Belum ada jurnal. Silakan buat di atas.</div>';
+          return;
+        }
+
+        appData.journals.forEach((journal) => {
+          const courseCount = journal.courses ? journal.courses.length : 0;
+          const li = document.createElement("li");
+          li.className = "list-item";
+          li.innerHTML = `
+          <div class="item-info" onclick="openTreeView('${journal.id}')">
+            <div class="item-date">${journal.date}</div>
+            <div class="item-title">${escapeHtml(journal.title)} <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">(${courseCount} Matkul)</span></div>
+          </div>
+          <div class="item-actions">
+            <button class="action-btn" onclick="editJournal('${journal.id}')">Edit</button>
+            <button class="action-btn delete" onclick="deleteJournal('${journal.id}')">Hapus</button>
+          </div>
+        `;
+          journalList.appendChild(li);
+        });
+      }
+
+      formAddJournal.onsubmit = (e) => {
+        e.preventDefault();
+        const date = inputJournalDate.value;
+        const title = inputJournalTitle.value.trim();
+        if (!date || !title) return;
+
+        if (!appData.journals) appData.journals = [];
+        appData.journals.push({
+          id: "jrn-" + Date.now(),
+          date,
+          title,
+          courses: [],
+        });
+
+        inputJournalTitle.value = "";
+        saveData();
+        renderJournals();
+      };
+
+      window.editJournal = (id) => {
+        const journal = appData.journals.find((j) => j.id === id);
+        if (!journal) return;
+        const newTitle = prompt("Edit Judul Jurnal:", journal.title);
+        if (newTitle && newTitle.trim() !== "") {
+          journal.title = newTitle.trim();
+          saveData();
+          renderJournals();
+        }
+      };
+
+      window.deleteJournal = (id) => {
+        const journal = appData.journals.find((j) => j.id === id);
+        if (confirm(`Hapus jurnal "${journal.title}"?`)) {
+          appData.journals = appData.journals.filter((j) => j.id !== id);
+          saveData();
+          renderJournals();
+        }
+      };
+
+      // TREE VIEW (MATKUL & PERTEMUAN)
+      window.openTreeView = (journalId) => {
+        selectedJournalId = journalId;
+        const journal = appData.journals.find((j) => j.id === journalId);
+        if (!journal) return;
+
+        selectedJournalDate.textContent = journal.date;
+        selectedJournalTitle.textContent = journal.title;
+
+        journalView.style.display = "none";
+        treeView.style.display = "block";
+
+        switchMode("view"); // Auto reset ke mode View tiap buka detail
+        renderTree();
+      };
+
+      btnBackToJournals.onclick = () => {
+        selectedJournalId = null;
+        treeView.style.display = "none";
+        journalView.style.display = "block";
+        renderJournals();
+      };
+
+      function renderTree() {
+        coursesContainer.innerHTML = "";
+        const journal = appData.journals.find(
+          (j) => j.id === selectedJournalId,
+        );
+        if (!journal) return;
+
+        if (!journal.courses || journal.courses.length === 0) {
+          coursesContainer.innerHTML =
+            '<div class="empty-state">Belum ada mata kuliah di jurnal ini. Masuk ke mode <b>Edit</b> untuk menambahkan.</div>';
+          return;
+        }
+
+        journal.courses.forEach((course) => {
+          const meetings = course.meetings || [];
+          const isAllCompleted =
+            meetings.length > 0 && meetings.every((m) => m.isCompleted);
+
+          const card = document.createElement("div");
+          card.className = "course-card";
+
+          let meetingsHTML = "";
+          meetings.forEach((mtg) => {
+            meetingsHTML += `
+            <div class="meeting-row">
+              <div class="meeting-left">
+                <input type="checkbox" ${mtg.isCompleted ? "checked" : ""} onchange="toggleMeeting('${course.id}', '${mtg.id}')">
+                <span class="meeting-text ${mtg.isCompleted ? "completed" : ""}" onclick="toggleMeeting('${course.id}', '${mtg.id}')">${escapeHtml(mtg.title)}</span>
+              </div>
+              <div class="item-actions edit-only">
+                <button class="action-btn" onclick="editMeeting('${course.id}', '${mtg.id}')">Edit</button>
+                <button class="action-btn delete" onclick="deleteMeeting('${course.id}', '${mtg.id}')">Hapus</button>
+              </div>
+            </div>
+          `;
+          });
+
+          card.innerHTML = `
+          <div class="course-header">
+            <div class="course-title-group">
+              <span class="course-name ${isAllCompleted ? "all-completed" : ""}">📘 ${escapeHtml(course.name)}</span>
+              <span class="badge-status ${isAllCompleted ? "completed" : ""}">
+                ${isAllCompleted ? "✓ Selesai" : `${meetings.filter((m) => m.isCompleted).length}/${meetings.length} Selesai`}
+              </span>
+            </div>
+            <div class="item-actions edit-only">
+              <button class="action-btn" onclick="editCourse('${course.id}')">Edit</button>
+              <button class="action-btn delete" onclick="deleteCourse('${course.id}')">Hapus</button>
+            </div>
+          </div>
+
+          <!-- LIST PERTEMUAN (TREE BRANCH) -->
+          <div class="meetings-tree">
+            ${meetingsHTML}
+            <div class="add-meeting-box edit-only">
+              <input type="text" id="inputMtg-${course.id}" placeholder="+ Tambah pertemuan..." onkeypress="handleMtgKeyPress(event, '${course.id}')">
+              <button onclick="addMeeting('${course.id}')">Tambah</button>
+            </div>
+          </div>
+        `;
+
+          coursesContainer.appendChild(card);
+        });
+      }
+
+      // MATKUL ACTIONS
+      formAddCourse.onsubmit = (e) => {
+        e.preventDefault();
+        const name = inputCourseName.value.trim();
+        if (!name || !selectedJournalId) return;
+
+        const journal = appData.journals.find(
+          (j) => j.id === selectedJournalId,
+        );
+        if (!journal.courses) journal.courses = [];
+
+        journal.courses.push({ id: "crs-" + Date.now(), name, meetings: [] });
+
+        inputCourseName.value = "";
+        saveData();
+        renderTree();
+      };
+
+      window.editCourse = (courseId) => {
+        const journal = appData.journals.find(
+          (j) => j.id === selectedJournalId,
+        );
+        const course = journal.courses.find((c) => c.id === courseId);
+        const newName = prompt("Edit Nama Mata Kuliah:", course.name);
+        if (newName && newName.trim() !== "") {
+          course.name = newName.trim();
+          saveData();
+          renderTree();
+        }
+      };
+
+      window.deleteCourse = (courseId) => {
+        const journal = appData.journals.find(
+          (j) => j.id === selectedJournalId,
+        );
+        const course = journal.courses.find((c) => c.id === courseId);
+        if (
+          confirm(
+            `Hapus mata kuliah "${course.name}" beserta seluruh pertemuannya?`,
+          )
+        ) {
+          journal.courses = journal.courses.filter((c) => c.id !== courseId);
+          saveData();
+          renderTree();
+        }
+      };
+
+      // PERTEMUAN ACTIONS
+      window.addMeeting = (courseId) => {
+        const input = document.getElementById(`inputMtg-${courseId}`);
+        const title = input.value.trim();
+        if (!title) return;
+
+        const journal = appData.journals.find(
+          (j) => j.id === selectedJournalId,
+        );
+        const course = journal.courses.find((c) => c.id === courseId);
+        if (!course.meetings) course.meetings = [];
+
+        course.meetings.push({
+          id: "mtg-" + Date.now(),
+          title,
+          isCompleted: false,
+        });
+
+        input.value = "";
+        saveData();
+        renderTree();
+      };
+
+      window.handleMtgKeyPress = (e, courseId) => {
+        if (e.key === "Enter") addMeeting(courseId);
+      };
+
+      window.toggleMeeting = (courseId, meetingId) => {
+        const journal = appData.journals.find(
+          (j) => j.id === selectedJournalId,
+        );
+        const course = journal.courses.find((c) => c.id === courseId);
+        const meeting = course.meetings.find((m) => m.id === meetingId);
+
+        meeting.isCompleted = !meeting.isCompleted;
+        saveData();
+        renderTree();
+      };
+
+      window.editMeeting = (courseId, meetingId) => {
+        const journal = appData.journals.find(
+          (j) => j.id === selectedJournalId,
+        );
+        const course = journal.courses.find((c) => c.id === courseId);
+        const meeting = course.meetings.find((m) => m.id === meetingId);
+
+        const newTitle = prompt("Edit Nama Pertemuan:", meeting.title);
+        if (newTitle && newTitle.trim() !== "") {
+          meeting.title = newTitle.trim();
+          saveData();
+          renderTree();
+        }
+      };
+
+      window.deleteMeeting = (courseId, meetingId) => {
+        const journal = appData.journals.find(
+          (j) => j.id === selectedJournalId,
+        );
+        const course = journal.courses.find((c) => c.id === courseId);
+
+        journal.courses.find((c) => c.id === courseId).meetings =
+          course.meetings.filter((m) => m.id !== meetingId);
+        saveData();
+        renderTree();
+      };
+
+      // EXPORT & RESET
       btnExport.onclick = () => {
         const dataStr =
           "data:text/json;charset=utf-8," +
@@ -324,205 +748,23 @@
         downloadAnchor.setAttribute("href", dataStr);
         downloadAnchor.setAttribute(
           "download",
-          `backup-kuliah-${Date.now()}.json`,
+          `backup-jurnal-${Date.now()}.json`,
         );
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
       };
 
-      // Reset ke data.json awal dari server
       btnReset.onclick = async () => {
         if (
           confirm(
-            "Reset semua data ke data awal dari server data.json? Perubahan lokal akan hilang.",
+            "Reset semua data ke data awal server? Perubahan lokal akan hilang.",
           )
         ) {
-          localStorage.removeItem("kuliah_app_data");
+          localStorage.removeItem("kuliah_tree_app_data");
           await fetchInitialJSON();
-          renderCourses();
-        }
-      };
-
-      // --- LOGIKA MATA KULIAH ---
-
-      function renderCourses() {
-        courseList.innerHTML = "";
-
-        if (!appData.courses || appData.courses.length === 0) {
-          courseList.innerHTML =
-            '<div class="empty-state">Belum ada mata kuliah. Silakan tambah di atas.</div>';
-          return;
-        }
-
-        appData.courses.forEach((course) => {
-          const meetingCount = course.meetings ? course.meetings.length : 0;
-          const canDelete = meetingCount === 0;
-
-          const li = document.createElement("li");
-          li.className = "list-item";
-          li.innerHTML = `
-          <div class="item-title" onclick="openMeetingView('${course.id}')">
-            ${escapeHtml(course.name)} <span class="badge-count">${meetingCount} pertemuan</span>
-          </div>
-          <div class="item-actions">
-            <button class="action-btn" onclick="editCourse('${course.id}')">Edit</button>
-            <button class="action-btn delete" onclick="deleteCourse('${course.id}')" ${!canDelete ? 'disabled title="Hapus semua pertemuan terlebih dahulu"' : ""}>Hapus</button>
-          </div>
-        `;
-          courseList.appendChild(li);
-        });
-      }
-
-      formAddCourse.onsubmit = (e) => {
-        e.preventDefault();
-        const name = inputCourseName.value.trim();
-        if (!name) return;
-
-        if (!appData.courses) appData.courses = [];
-        appData.courses.push({
-          id: "crs-" + Date.now(),
-          name: name,
-          meetings: [],
-        });
-
-        inputCourseName.value = "";
-        saveData();
-        renderCourses();
-      };
-
-      window.editCourse = (id) => {
-        const course = appData.courses.find((c) => c.id === id);
-        if (!course) return;
-
-        const newName = prompt("Edit nama mata kuliah:", course.name);
-        if (newName && newName.trim() !== "") {
-          course.name = newName.trim();
-          saveData();
-          renderCourses();
-          if (selectedCourseId === id)
-            currentCourseTitle.textContent = course.name;
-        }
-      };
-
-      window.deleteCourse = (id) => {
-        const course = appData.courses.find((c) => c.id === id);
-        if (!course) return;
-
-        if (course.meetings && course.meetings.length > 0) {
-          alert(
-            "Mata kuliah tidak bisa dihapus karena masih memiliki pertemuan!",
-          );
-          return;
-        }
-
-        if (confirm(`Yakin ingin menghapus mata kuliah "${course.name}"?`)) {
-          appData.courses = appData.courses.filter((c) => c.id !== id);
-          saveData();
-          renderCourses();
-        }
-      };
-
-      // --- LOGIKA PERTEMUAN ---
-
-      window.openMeetingView = (courseId) => {
-        selectedCourseId = courseId;
-        const course = appData.courses.find((c) => c.id === courseId);
-        if (!course) return;
-
-        currentCourseTitle.textContent = course.name;
-        courseView.style.display = "none";
-        meetingView.style.display = "block";
-
-        renderMeetings();
-      };
-
-      btnBackToCourses.onclick = () => {
-        selectedCourseId = null;
-        meetingView.style.display = "none";
-        courseView.style.display = "block";
-        renderCourses();
-      };
-
-      function renderMeetings() {
-        meetingList.innerHTML = "";
-        const course = appData.courses.find((c) => c.id === selectedCourseId);
-        if (!course) return;
-
-        if (!course.meetings || course.meetings.length === 0) {
-          meetingList.innerHTML =
-            '<div class="empty-state">Belum ada pertemuan di mata kuliah ini.</div>';
-          return;
-        }
-
-        course.meetings.forEach((meeting) => {
-          const li = document.createElement("li");
-          li.className = "list-item";
-          li.innerHTML = `
-          <div class="meeting-item ${meeting.isCompleted ? "completed" : ""}">
-            <input type="checkbox" ${meeting.isCompleted ? "checked" : ""} onchange="toggleMeeting('${meeting.id}')">
-            <span class="item-title meeting-title" onclick="toggleMeeting('${meeting.id}')">${escapeHtml(meeting.title)}</span>
-          </div>
-          <div class="item-actions">
-            <button class="action-btn" onclick="editMeeting('${meeting.id}')">Edit</button>
-            <button class="action-btn delete" onclick="deleteMeeting('${meeting.id}')">Hapus</button>
-          </div>
-        `;
-          meetingList.appendChild(li);
-        });
-      }
-
-      formAddMeeting.onsubmit = (e) => {
-        e.preventDefault();
-        const title = inputMeetingTitle.value.trim();
-        if (!title || !selectedCourseId) return;
-
-        const course = appData.courses.find((c) => c.id === selectedCourseId);
-        if (!course.meetings) course.meetings = [];
-
-        course.meetings.push({
-          id: "mtg-" + Date.now(),
-          title: title,
-          isCompleted: false,
-        });
-
-        inputMeetingTitle.value = "";
-        saveData();
-        renderMeetings();
-      };
-
-      window.toggleMeeting = (meetingId) => {
-        const course = appData.courses.find((c) => c.id === selectedCourseId);
-        const meeting = course.meetings.find((m) => m.id === meetingId);
-        if (!meeting) return;
-
-        meeting.isCompleted = !meeting.isCompleted;
-        saveData();
-        renderMeetings();
-      };
-
-      window.editMeeting = (meetingId) => {
-        const course = appData.courses.find((c) => c.id === selectedCourseId);
-        const meeting = course.meetings.find((m) => m.id === meetingId);
-        if (!meeting) return;
-
-        const newTitle = prompt("Edit nama/judul pertemuan:", meeting.title);
-        if (newTitle && newTitle.trim() !== "") {
-          meeting.title = newTitle.trim();
-          saveData();
-          renderMeetings();
-        }
-      };
-
-      window.deleteMeeting = (meetingId) => {
-        const course = appData.courses.find((c) => c.id === selectedCourseId);
-        const meeting = course.meetings.find((m) => m.id === meetingId);
-        if (!meeting) return;
-
-        if (confirm(`Yakin ingin menghapus "${meeting.title}"?`)) {
-          course.meetings = course.meetings.filter((m) => m.id !== meetingId);
-          saveData();
-          renderMeetings();
+          renderJournals();
+          if (selectedJournalId) renderTree();
         }
       };
 
