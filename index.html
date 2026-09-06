@@ -3,20 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manajemen Jurnal Kuliah</title>
+    <title>Jadwal Kuliah UNPAM - 07TPLE004</title>
     <style>
+      /* THEME VARIABLES (DARK MODE DEFAULT) */
       :root {
-        --bg: #f8f9fa;
+        --bg: #0f172a;
+        --card-bg: #1e293b;
+        --card-passed: #0b1120;
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --border: #334155;
+        --primary: #3b82f6;
+        --success: #22c55e;
+        --radius: 12px;
+        --icon-bg: #334155;
+      }
+
+      /* LIGHT MODE OVERRIDE */
+      body.light-mode {
+        --bg: #f8fafc;
         --card-bg: #ffffff;
-        --text: #212529;
-        --text-muted: #6c757d;
-        --border: #e9ecef;
+        --card-passed: #e2e8f0;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
         --primary: #2563eb;
-        --primary-hover: #1d4ed8;
         --success: #16a34a;
-        --danger: #dc2626;
-        --danger-hover: #b91c1c;
-        --radius: 8px;
+        --icon-bg: #f1f5f9;
       }
 
       * {
@@ -31,11 +44,14 @@
       body {
         background-color: var(--bg);
         color: var(--text);
-        padding: 40px 20px;
+        padding: 30px 16px;
         line-height: 1.5;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
       }
       .container {
-        max-width: 760px;
+        max-width: 720px;
         margin: 0 auto;
       }
 
@@ -44,728 +60,533 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 16px;
       }
       h1 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: 700;
+        color: var(--primary);
       }
-      .header-actions {
+      .sub-title {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .header-controls {
         display: flex;
         gap: 8px;
+        align-items: center;
       }
-
-      .card {
-        background: var(--card-bg);
-        border-radius: var(--radius);
-        border: 1px solid var(--border);
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      }
-
-      input[type="text"],
-      input[type="date"] {
-        padding: 10px 14px;
-        border: 1px solid #cbd5e1;
-        border-radius: var(--radius);
-        font-size: 0.95rem;
-        outline: none;
-      }
-      input[type="text"]:focus,
-      input[type="date"]:focus {
-        border-color: var(--primary);
-      }
-
-      button {
-        padding: 8px 14px;
-        border-radius: var(--radius);
-        border: none;
-        background: var(--primary);
-        color: white;
-        font-weight: 500;
-        cursor: pointer;
-        font-size: 0.88rem;
-        transition: background 0.2s;
-      }
-      button:hover {
-        background: var(--primary-hover);
-      }
-      button.btn-outline {
+      .btn-theme,
+      .btn-reset-user {
         background: transparent;
+        border: 1px solid var(--border);
         color: var(--text);
-        border: 1px solid #cbd5e1;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
       }
-      button.btn-outline:hover {
-        background: #f1f5f9;
+      .btn-theme:hover {
+        background: var(--icon-bg);
       }
-      button.btn-danger {
-        background: var(--danger);
+      .btn-reset-user {
+        border-color: #ef4444;
+        color: #ef4444;
       }
-      button.btn-danger:hover {
-        background: var(--danger-hover);
+      .btn-reset-user:hover {
+        background: rgba(239, 68, 68, 0.1);
       }
 
-      .form-journal {
+      .pekan-grid {
         display: grid;
-        grid-template-columns: 160px 1fr auto;
-        gap: 10px;
-        margin-bottom: 10px;
-      }
-      .form-inline {
-        display: flex;
-        gap: 10px;
-      }
-
-      .list {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 12px;
       }
-      .list-item {
-        padding: 16px;
+      .pekan-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        position: relative;
+      }
+      .pekan-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
       }
 
-      .item-info {
-        cursor: pointer;
-        flex: 1;
+      /* STYLE UNTUK PEKAN YANG SUDAH LEWAT */
+      .pekan-card.passed {
+        background: var(--card-passed);
+        opacity: 0.75;
+        border-style: dashed;
       }
-      .item-date {
-        font-size: 0.8rem;
+      .pekan-card.passed::after {
+        content: "✓ Lewat";
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .pekan-num {
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .pekan-date {
+        font-size: 0.75rem;
         color: var(--primary);
         font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 2px;
+        margin-top: 4px;
       }
-      .item-title {
-        font-weight: 600;
-        font-size: 1.05rem;
-      }
-
-      .item-actions {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-      }
-      .action-btn {
-        background: none;
-        border: none;
+      .pekan-progress {
+        font-size: 0.75rem;
         color: var(--text-muted);
-        cursor: pointer;
-        padding: 4px 8px;
-        font-size: 0.85rem;
+        margin-top: 8px;
       }
-      .action-btn:hover {
-        color: var(--text);
-      }
-      .action-btn.delete:hover {
-        color: var(--danger);
+      .pekan-progress.complete {
+        color: var(--success);
+        font-weight: 600;
       }
 
-      /* NAVBAR TREE VIEW & MODE SWITCH */
       .nav-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 12px;
         margin-bottom: 20px;
       }
-      .nav-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .mode-switch-box {
-        display: flex;
-        align-items: center;
-        background: #e2e8f0;
-        padding: 3px;
-        border-radius: 20px;
-        gap: 2px;
-      }
-      .mode-btn {
-        padding: 6px 14px;
-        border-radius: 16px;
-        font-size: 0.8rem;
-        font-weight: 600;
+      .btn-back {
         background: transparent;
-        color: var(--text-muted);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 6px 12px;
+        border-radius: 8px;
         cursor: pointer;
-        border: none;
-        transition: all 0.2s;
-      }
-      .mode-btn.active {
-        background: white;
-        color: var(--primary);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
 
-      /* TREE VIEW STRUCTURE */
-      .course-card {
+      .section-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 20px 0 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .section-title.online {
+        color: #60a5fa;
+      }
+      .section-title.offline {
+        color: #f59e0b;
+      }
+
+      /* TASK CARD DENGAN CHECKBOX BULAT DI KANAN & ICON DI KIRI */
+      .task-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        padding: 16px;
-        margin-bottom: 16px;
-      }
-      .course-header {
+        padding: 12px 16px;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
       }
-      .course-title-group {
+      .task-card:hover {
+        border-color: var(--primary);
+      }
+
+      .task-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--icon-bg);
         display: flex;
         align-items: center;
-        gap: 10px;
-      }
-      .course-name {
-        font-weight: 600;
+        justify-content: center;
         font-size: 1.1rem;
-      }
-      .course-name.all-completed {
-        text-decoration: line-through;
-        color: var(--text-muted);
+        flex-shrink: 0;
       }
 
-      .badge-status {
-        font-size: 0.75rem;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-weight: 600;
-        background: #f1f5f9;
-        color: var(--text-muted);
-      }
-      .badge-status.completed {
-        background: #dcfce7;
-        color: var(--success);
-      }
-
-      .meetings-tree {
-        margin-left: 20px;
-        padding-left: 14px;
-        border-left: 2px dashed #cbd5e1;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .meeting-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 12px;
-        background: #f8fafc;
-        border-radius: var(--radius);
-        border: 1px solid #f1f5f9;
-      }
-      .meeting-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+      .task-info {
         flex: 1;
       }
-      .meeting-left input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        cursor: pointer;
-      }
-      .meeting-text {
+      .task-matkul {
+        font-weight: 600;
         font-size: 0.95rem;
-        cursor: pointer;
       }
-      .meeting-text.completed {
-        text-decoration: line-through;
+      .task-pertemuan {
+        font-size: 0.8rem;
         color: var(--text-muted);
       }
 
-      .add-meeting-box {
-        margin-top: 10px;
-        margin-left: 20px;
+      /* CHECKBOX BULAT (KANAN) */
+      .round-checkbox {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid var(--text-muted);
         display: flex;
-        gap: 8px;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
       }
-      .add-meeting-box input {
-        padding: 6px 10px;
-        font-size: 0.85rem;
+      .task-completed .round-checkbox {
+        background: var(--success);
+        border-color: var(--success);
+        color: white;
+      }
+      .task-completed .task-matkul,
+      .task-completed .task-pertemuan {
+        text-decoration: line-through;
+        opacity: 0.5;
       }
 
-      /* CONTROL HIDE/SHOW SESUAI MODE */
-      body.mode-view .edit-only {
-        display: none !important;
-      }
-
-      .empty-state {
-        text-align: center;
+      .badge-sks {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: var(--icon-bg);
         color: var(--text-muted);
-        padding: 30px 0;
-        font-size: 0.95rem;
+        margin-left: 6px;
       }
     </style>
   </head>
-  <body class="mode-view">
-    <!-- DEFAULT MODE: VIEW -->
-
+  <body>
     <div class="container">
       <header>
-        <h1>📚 Jurnal Kuliah</h1>
-        <div class="header-actions">
-          <button
-            id="btnExport"
-            class="btn-outline"
-            title="Backup ke file .json"
-          >
-            💾 Backup .JSON
+        <div>
+          <h1 id="appTitle">🎓 Dashboard Kuliah</h1>
+          <div id="appSubtitle" class="sub-title">
+            Kelas 07TPLE004 • Reguler C
+          </div>
+        </div>
+        <div class="header-controls">
+          <button class="btn-theme" onclick="toggleTheme()" id="themeBtn">
+            🌙 Dark
           </button>
-          <button id="btnReset" class="btn-outline" title="Reset Data">
+          <button class="btn-reset-user" onclick="resetMyProgress()">
             🔄 Reset
           </button>
         </div>
       </header>
 
-      <!-- VIEW 1: MASTER LIST JURNAL -->
-      <div id="journalView">
-        <div class="card">
-          <form id="formAddJournal" class="form-journal">
-            <input type="date" id="inputJournalDate" required />
-            <input
-              type="text"
-              id="inputJournalTitle"
-              placeholder="Judul Jurnal / Sesi (misal: Sesi Minggu 1)..."
-              required
-            />
-            <button type="submit">Tambah Jurnal</button>
-          </form>
-        </div>
-
-        <ul id="journalList" class="list"></ul>
+      <div id="pekanListView">
+        <div id="pekanGrid" class="pekan-grid"></div>
       </div>
 
-      <!-- VIEW 2: TREE VIEW MATKUL & PERTEMUAN -->
-      <div id="treeView" style="display: none">
+      <div id="pekanDetailView" style="display: none">
         <div class="nav-header">
-          <div class="nav-left">
-            <button id="btnBackToJournals" class="btn-outline">
-              ← Kembali
-            </button>
-            <div>
-              <div id="selectedJournalDate" class="item-date"></div>
-              <h2 id="selectedJournalTitle">Detail Jurnal</h2>
-            </div>
-          </div>
-
-          <!-- SWITCH MODE BUTTON -->
-          <div class="mode-switch-box">
-            <button
-              id="btnModeView"
-              class="mode-btn active"
-              onclick="switchMode('view')"
-            >
-              👁️ View
-            </button>
-            <button
-              id="btnModeEdit"
-              class="mode-btn"
-              onclick="switchMode('edit')"
-            >
-              ✏️ Edit
-            </button>
+          <button class="btn-back" onclick="showPekanList()">←</button>
+          <div>
+            <h2 id="detailPekanTitle">Pekan 1</h2>
+            <div id="detailPekanSubtitle" class="sub-title"></div>
           </div>
         </div>
 
-        <!-- FORM TAMBAH MATKUL (Hanya Muncul Saat Mode Edit) -->
-        <div class="card edit-only">
-          <form id="formAddCourse" class="form-inline">
-            <input
-              type="text"
-              id="inputCourseName"
-              placeholder="Tambah Mata Kuliah baru..."
-              required
-            />
-            <button type="submit">Tambah Matkul</button>
-          </form>
-        </div>
+        <div class="section-title online">💻 Online (Senin - Jumat)</div>
+        <div id="onlineTasksList"></div>
 
-        <div id="coursesContainer"></div>
+        <div class="section-title offline">🏫 Offline / Tatap Muka (Sabtu)</div>
+        <div id="offlineTasksList"></div>
       </div>
     </div>
 
     <script>
-      let appData = { journals: [] };
-      let selectedJournalId = null;
-      let currentMode = "view"; // 'view' atau 'edit'
-
-      // DOM Elements
-      const journalView = document.getElementById("journalView");
-      const treeView = document.getElementById("treeView");
-      const formAddJournal = document.getElementById("formAddJournal");
-      const inputJournalDate = document.getElementById("inputJournalDate");
-      const inputJournalTitle = document.getElementById("inputJournalTitle");
-      const journalList = document.getElementById("journalList");
-
-      const btnBackToJournals = document.getElementById("btnBackToJournals");
-      const selectedJournalDate = document.getElementById(
-        "selectedJournalDate",
-      );
-      const selectedJournalTitle = document.getElementById(
-        "selectedJournalTitle",
-      );
-      const formAddCourse = document.getElementById("formAddCourse");
-      const inputCourseName = document.getElementById("inputCourseName");
-      const coursesContainer = document.getElementById("coursesContainer");
-
-      const btnModeView = document.getElementById("btnModeView");
-      const btnModeEdit = document.getElementById("btnModeEdit");
-
-      const btnExport = document.getElementById("btnExport");
-      const btnReset = document.getElementById("btnReset");
-
-      inputJournalDate.valueAsDate = new Date();
-
-      // FUNCTION SWITCH MODE VIEW / EDIT
-      window.switchMode = (mode) => {
-        currentMode = mode;
-        if (mode === "view") {
-          document.body.classList.add("mode-view");
-          btnModeView.classList.add("active");
-          btnModeEdit.classList.remove("active");
-        } else {
-          document.body.classList.remove("mode-view");
-          btnModeEdit.classList.add("active");
-          btnModeView.classList.remove("active");
-        }
+      // =========================================================================
+      // CONFIG MASTER KULIAH (BISA DIGANTI TIAP SEMESTER BARU BERJALAN)
+      // =========================================================================
+      const SEMESTER_CONFIG = {
+        title: "🎓 Dashboard Kuliah UNPAM",
+        subtitle: "Kelas 07TPLE004 • Reguler C",
+        startDate: new Date(2026, 7, 31), // 31 Agustus 2026 (Format Month 0-Index: 7 = Agustus)
+        courses: [
+          { id: "c1", name: "Kecakapan Antar Personal", sks: 2, period: 1 },
+          { id: "c2", name: "Keamanan Komputer", sks: 2, period: 1 },
+          { id: "c3", name: "Pemrograman Web II", sks: 3, period: 1 },
+          { id: "c4", name: "Jaringan Nirkabel", sks: 2, period: 1 },
+          { id: "c5", name: "Etika Profesi", sks: 2, period: 2 },
+          { id: "c6", name: "Manajemen Proyek Informatika", sks: 2, period: 2 },
+          {
+            id: "c7",
+            name: "Testing dan QA Perangkat Lunak",
+            sks: 2,
+            period: 2,
+          },
+          {
+            id: "c8",
+            name: "Arsitektur dan Organisasi Komputer",
+            sks: 3,
+            period: 2,
+          },
+        ],
       };
 
-      // INIT APP
-      async function initApp() {
-        const savedData = localStorage.getItem("kuliah_tree_app_data");
-        if (savedData) {
-          try {
-            appData = JSON.parse(savedData);
-          } catch (e) {
-            await fetchInitialJSON();
+      const LOCAL_STORAGE_KEY = "unpam_user_progress_v2";
+      const THEME_STORAGE_KEY = "unpam_theme_mode";
+      let userProgress = {};
+      let currentPekan = null;
+
+      function initApp() {
+        // Set Header Info
+        document.getElementById("appTitle").textContent = SEMESTER_CONFIG.title;
+        document.getElementById("appSubtitle").textContent =
+          SEMESTER_CONFIG.subtitle;
+
+        // Load Theme
+        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+        if (savedTheme === "light") {
+          document.body.classList.add("light-mode");
+          document.getElementById("themeBtn").textContent = "☀️ Light";
+        }
+
+        // Load User Progress
+        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (saved) userProgress = JSON.parse(saved);
+        renderPekanGrid();
+      }
+
+      function toggleTheme() {
+        document.body.classList.toggle("light-mode");
+        const isLight = document.body.classList.contains("light-mode");
+        document.getElementById("themeBtn").textContent = isLight
+          ? "☀️ Light"
+          : "🌙 Dark";
+        localStorage.setItem(THEME_STORAGE_KEY, isLight ? "light" : "dark");
+      }
+
+      function saveProgress() {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userProgress));
+      }
+
+      function resetMyProgress() {
+        if (
+          confirm("Yakin mau mengosongkan semua centangan perkuliahan kamu?")
+        ) {
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
+          userProgress = {};
+          renderPekanGrid();
+          if (currentPekan) renderTasks();
+        }
+      }
+
+      function getPekanDateRangeObj(pekanNum) {
+        const startDate = new Date(SEMESTER_CONFIG.startDate);
+        startDate.setDate(startDate.getDate() + (pekanNum - 1) * 7);
+
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 5); // Sabtu
+
+        return { startDate, endDate };
+      }
+
+      function getPekanDateRangeStr(pekanNum) {
+        const { startDate, endDate } = getPekanDateRangeObj(pekanNum);
+        const opt = { day: "2-digit", month: "short" };
+        const startStr = startDate.toLocaleDateString("id-ID", opt);
+        const endStr = endDate.toLocaleDateString("id-ID", {
+          ...opt,
+          year: "numeric",
+        });
+        return `${startStr} - ${endStr}`;
+      }
+
+      function isPekanPassed(pekanNum) {
+        const { endDate } = getPekanDateRangeObj(pekanNum);
+        const today = new Date();
+        // Set jam ke akhir hari Sabtu
+        endDate.setHours(23, 59, 59, 999);
+        return today > endDate;
+      }
+
+      function getAcademicWeekIndex(pekanNum) {
+        if (pekanNum < 8) return pekanNum;
+        if (pekanNum > 8) return pekanNum - 1;
+        return 0; // UTS
+      }
+
+      function isMeetingOnline(course, mtgNum) {
+        const isPreUTSPhase = course.sks === 2 ? mtgNum <= 7 : mtgNum <= 10;
+        return isPreUTSPhase ? course.period === 2 : course.period === 1;
+      }
+
+      function generatePekanTasks(pekanNum) {
+        const academicWeek = getAcademicWeekIndex(pekanNum);
+        if (academicWeek === 0) return { online: [], offline: [] };
+
+        const is3SksDouble = academicWeek % 2 === 0;
+        let online = [];
+        let offline = [];
+
+        SEMESTER_CONFIG.courses.forEach((course) => {
+          if (course.sks === 2) {
+            const mtgNum = academicWeek;
+            if (mtgNum <= 14) {
+              const taskId = `p${pekanNum}_${course.id}_P${mtgNum}`;
+              const taskObj = {
+                id: taskId,
+                courseName: course.name,
+                sks: course.sks,
+                meetingName: `Pertemuan ${mtgNum}`,
+                isCompleted: !!userProgress[taskId],
+              };
+
+              if (isMeetingOnline(course, mtgNum)) online.push(taskObj);
+              else offline.push(taskObj);
+            }
+          } else if (course.sks === 3) {
+            let mtgList = [];
+            if (is3SksDouble) {
+              let baseMtg = (academicWeek / 2) * 3 - 1;
+              mtgList.push(baseMtg, baseMtg + 1);
+            } else {
+              let baseMtg = Math.floor(academicWeek / 2) * 3 + 1;
+              mtgList.push(baseMtg);
+            }
+
+            mtgList.forEach((mtgNum, idx) => {
+              if (mtgNum <= 21) {
+                const taskId = `p${pekanNum}_${course.id}_P${mtgNum}`;
+                const taskObj = {
+                  id: taskId,
+                  courseName: course.name,
+                  sks: course.sks,
+                  meetingName: `Pertemuan ${mtgNum}`,
+                  isCompleted: !!userProgress[taskId],
+                };
+
+                if (is3SksDouble && idx === 0) {
+                  online.push(taskObj);
+                } else {
+                  if (isMeetingOnline(course, mtgNum)) online.push(taskObj);
+                  else offline.push(taskObj);
+                }
+              }
+            });
           }
-        } else {
-          await fetchInitialJSON();
-        }
-        renderJournals();
-      }
-
-      async function fetchInitialJSON() {
-        try {
-          const response = await fetch("./data.json");
-          if (!response.ok) throw new Error();
-          appData = await response.json();
-          saveData();
-        } catch (err) {
-          appData = { journals: [] };
-          saveData();
-        }
-      }
-
-      function saveData() {
-        localStorage.setItem("kuliah_tree_app_data", JSON.stringify(appData));
-      }
-
-      // MASTER LIST JURNAL
-      function renderJournals() {
-        journalList.innerHTML = "";
-        if (!appData.journals || appData.journals.length === 0) {
-          journalList.innerHTML =
-            '<div class="empty-state">Belum ada jurnal. Silakan buat di atas.</div>';
-          return;
-        }
-
-        appData.journals.forEach((journal) => {
-          const courseCount = journal.courses ? journal.courses.length : 0;
-          const li = document.createElement("li");
-          li.className = "list-item";
-          li.innerHTML = `
-          <div class="item-info" onclick="openTreeView('${journal.id}')">
-            <div class="item-date">${journal.date}</div>
-            <div class="item-title">${escapeHtml(journal.title)} <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">(${courseCount} Matkul)</span></div>
-          </div>
-          <div class="item-actions">
-            <button class="action-btn" onclick="editJournal('${journal.id}')">Edit</button>
-            <button class="action-btn delete" onclick="deleteJournal('${journal.id}')">Hapus</button>
-          </div>
-        `;
-          journalList.appendChild(li);
-        });
-      }
-
-      formAddJournal.onsubmit = (e) => {
-        e.preventDefault();
-        const date = inputJournalDate.value;
-        const title = inputJournalTitle.value.trim();
-        if (!date || !title) return;
-
-        if (!appData.journals) appData.journals = [];
-        appData.journals.push({
-          id: "jrn-" + Date.now(),
-          date,
-          title,
-          courses: [],
         });
 
-        inputJournalTitle.value = "";
-        saveData();
-        renderJournals();
-      };
+        return { online, offline };
+      }
 
-      window.editJournal = (id) => {
-        const journal = appData.journals.find((j) => j.id === id);
-        if (!journal) return;
-        const newTitle = prompt("Edit Judul Jurnal:", journal.title);
-        if (newTitle && newTitle.trim() !== "") {
-          journal.title = newTitle.trim();
-          saveData();
-          renderJournals();
-        }
-      };
+      function renderPekanGrid() {
+        const grid = document.getElementById("pekanGrid");
+        grid.innerHTML = "";
 
-      window.deleteJournal = (id) => {
-        const journal = appData.journals.find((j) => j.id === id);
-        if (confirm(`Hapus jurnal "${journal.title}"?`)) {
-          appData.journals = appData.journals.filter((j) => j.id !== id);
-          saveData();
-          renderJournals();
-        }
-      };
+        for (let i = 1; i <= 16; i++) {
+          const dateRange = getPekanDateRangeStr(i);
+          const passed = isPekanPassed(i);
 
-      // TREE VIEW (MATKUL & PERTEMUAN)
-      window.openTreeView = (journalId) => {
-        selectedJournalId = journalId;
-        const journal = appData.journals.find((j) => j.id === journalId);
-        if (!journal) return;
+          if (i === 8) {
+            const utsCard = document.createElement("div");
+            utsCard.className = `pekan-card ${passed ? "passed" : ""}`;
+            utsCard.style.borderColor = "#ef4444";
+            utsCard.innerHTML = `
+            <div class="pekan-num" style="color: #ef4444;">PEKAN 8</div>
+            <div class="pekan-date" style="color: #fca5a5;">${dateRange}</div>
+            <div style="font-size: 0.75rem; color: #ef4444; font-weight: 700; margin-top: 6px;">🔥 Ujian Tengah Semester (UTS)</div>
+          `;
+            grid.appendChild(utsCard);
+            continue;
+          }
 
-        selectedJournalDate.textContent = journal.date;
-        selectedJournalTitle.textContent = journal.title;
+          if (i === 16) {
+            const uasCard = document.createElement("div");
+            uasCard.className = `pekan-card ${passed ? "passed" : ""}`;
+            uasCard.style.borderColor = "#22c55e";
+            uasCard.innerHTML = `
+            <div class="pekan-num" style="color: #22c55e;">PEKAN 16</div>
+            <div class="pekan-date" style="color: #86efac;">${dateRange}</div>
+            <div style="font-size: 0.75rem; color: #22c55e; font-weight: 700; margin-top: 6px;">🏆 Ujian Akhir Semester (UAS)</div>
+          `;
+            grid.appendChild(uasCard);
+            continue;
+          }
 
-        journalView.style.display = "none";
-        treeView.style.display = "block";
-
-        switchMode("view"); // Auto reset ke mode View tiap buka detail
-        renderTree();
-      };
-
-      btnBackToJournals.onclick = () => {
-        selectedJournalId = null;
-        treeView.style.display = "none";
-        journalView.style.display = "block";
-        renderJournals();
-      };
-
-      function renderTree() {
-        coursesContainer.innerHTML = "";
-        const journal = appData.journals.find(
-          (j) => j.id === selectedJournalId,
-        );
-        if (!journal) return;
-
-        if (!journal.courses || journal.courses.length === 0) {
-          coursesContainer.innerHTML =
-            '<div class="empty-state">Belum ada mata kuliah di jurnal ini. Masuk ke mode <b>Edit</b> untuk menambahkan.</div>';
-          return;
-        }
-
-        journal.courses.forEach((course) => {
-          const meetings = course.meetings || [];
-          const isAllCompleted =
-            meetings.length > 0 && meetings.every((m) => m.isCompleted);
+          const tasks = generatePekanTasks(i);
+          const allTasks = [...tasks.online, ...tasks.offline];
+          const doneTasks = allTasks.filter((t) => t.isCompleted).length;
+          const isAllDone =
+            allTasks.length > 0 && doneTasks === allTasks.length;
 
           const card = document.createElement("div");
-          card.className = "course-card";
-
-          let meetingsHTML = "";
-          meetings.forEach((mtg) => {
-            meetingsHTML += `
-            <div class="meeting-row">
-              <div class="meeting-left">
-                <input type="checkbox" ${mtg.isCompleted ? "checked" : ""} onchange="toggleMeeting('${course.id}', '${mtg.id}')">
-                <span class="meeting-text ${mtg.isCompleted ? "completed" : ""}" onclick="toggleMeeting('${course.id}', '${mtg.id}')">${escapeHtml(mtg.title)}</span>
-              </div>
-              <div class="item-actions edit-only">
-                <button class="action-btn" onclick="editMeeting('${course.id}', '${mtg.id}')">Edit</button>
-                <button class="action-btn delete" onclick="deleteMeeting('${course.id}', '${mtg.id}')">Hapus</button>
-              </div>
-            </div>
-          `;
-          });
+          card.className = `pekan-card ${passed ? "passed" : ""}`;
+          card.onclick = () => openPekanDetail(i);
 
           card.innerHTML = `
-          <div class="course-header">
-            <div class="course-title-group">
-              <span class="course-name ${isAllCompleted ? "all-completed" : ""}">📘 ${escapeHtml(course.name)}</span>
-              <span class="badge-status ${isAllCompleted ? "completed" : ""}">
-                ${isAllCompleted ? "✓ Selesai" : `${meetings.filter((m) => m.isCompleted).length}/${meetings.length} Selesai`}
-              </span>
-            </div>
-            <div class="item-actions edit-only">
-              <button class="action-btn" onclick="editCourse('${course.id}')">Edit</button>
-              <button class="action-btn delete" onclick="deleteCourse('${course.id}')">Hapus</button>
-            </div>
-          </div>
-
-          <!-- LIST PERTEMUAN (TREE BRANCH) -->
-          <div class="meetings-tree">
-            ${meetingsHTML}
-            <div class="add-meeting-box edit-only">
-              <input type="text" id="inputMtg-${course.id}" placeholder="+ Tambah pertemuan..." onkeypress="handleMtgKeyPress(event, '${course.id}')">
-              <button onclick="addMeeting('${course.id}')">Tambah</button>
-            </div>
+          <div class="pekan-num">Pekan ${i}</div>
+          <div class="pekan-date">${dateRange}</div>
+          <div class="pekan-progress ${isAllDone ? "complete" : ""}">
+            ${isAllDone ? "✓ Selesai Semua" : `${doneTasks}/${allTasks.length} Selesai`}
           </div>
         `;
-
-          coursesContainer.appendChild(card);
-        });
+          grid.appendChild(card);
+        }
       }
 
-      // MATKUL ACTIONS
-      formAddCourse.onsubmit = (e) => {
-        e.preventDefault();
-        const name = inputCourseName.value.trim();
-        if (!name || !selectedJournalId) return;
+      function openPekanDetail(pekanNum) {
+        currentPekan = pekanNum;
+        document.getElementById("pekanListView").style.display = "none";
+        document.getElementById("pekanDetailView").style.display = "block";
 
-        const journal = appData.journals.find(
-          (j) => j.id === selectedJournalId,
-        );
-        if (!journal.courses) journal.courses = [];
+        document.getElementById("detailPekanTitle").textContent =
+          `Pekan ${pekanNum}`;
+        document.getElementById("detailPekanSubtitle").textContent =
+          `Periode: ${getPekanDateRangeStr(pekanNum)}`;
 
-        journal.courses.push({ id: "crs-" + Date.now(), name, meetings: [] });
+        renderTasks();
+      }
 
-        inputCourseName.value = "";
-        saveData();
-        renderTree();
-      };
+      function showPekanList() {
+        document.getElementById("pekanDetailView").style.display = "none";
+        document.getElementById("pekanListView").style.display = "block";
+        renderPekanGrid();
+      }
 
-      window.editCourse = (courseId) => {
-        const journal = appData.journals.find(
-          (j) => j.id === selectedJournalId,
-        );
-        const course = journal.courses.find((c) => c.id === courseId);
-        const newName = prompt("Edit Nama Mata Kuliah:", course.name);
-        if (newName && newName.trim() !== "") {
-          course.name = newName.trim();
-          saveData();
-          renderTree();
-        }
-      };
+      function renderTasks() {
+        const { online, offline } = generatePekanTasks(currentPekan);
 
-      window.deleteCourse = (courseId) => {
-        const journal = appData.journals.find(
-          (j) => j.id === selectedJournalId,
-        );
-        const course = journal.courses.find((c) => c.id === courseId);
-        if (
-          confirm(
-            `Hapus mata kuliah "${course.name}" beserta seluruh pertemuannya?`,
-          )
-        ) {
-          journal.courses = journal.courses.filter((c) => c.id !== courseId);
-          saveData();
-          renderTree();
-        }
-      };
+        const onlineContainer = document.getElementById("onlineTasksList");
+        const offlineContainer = document.getElementById("offlineTasksList");
 
-      // PERTEMUAN ACTIONS
-      window.addMeeting = (courseId) => {
-        const input = document.getElementById(`inputMtg-${courseId}`);
-        const title = input.value.trim();
-        if (!title) return;
+        onlineContainer.innerHTML = online
+          .map((t) => createTaskRowHTML(t, "💻"))
+          .join("");
+        offlineContainer.innerHTML = offline
+          .map((t) => createTaskRowHTML(t, "🏫"))
+          .join("");
+      }
 
-        const journal = appData.journals.find(
-          (j) => j.id === selectedJournalId,
-        );
-        const course = journal.courses.find((c) => c.id === courseId);
-        if (!course.meetings) course.meetings = [];
+      function createTaskRowHTML(task, modeIcon) {
+        return `
+        <div class="task-card ${task.isCompleted ? "task-completed" : ""}" onclick="toggleTask('${task.id}')">
+          <div class="task-icon">${modeIcon}</div>
+          <div class="task-info">
+            <div class="task-matkul">${escapeHtml(task.courseName)} <span class="badge-sks">${task.sks} SKS</span></div>
+            <div class="task-pertemuan">${task.meetingName}</div>
+          </div>
+          <div class="round-checkbox">
+            ${task.isCompleted ? "✓" : ""}
+          </div>
+        </div>
+      `;
+      }
 
-        course.meetings.push({
-          id: "mtg-" + Date.now(),
-          title,
-          isCompleted: false,
-        });
-
-        input.value = "";
-        saveData();
-        renderTree();
-      };
-
-      window.handleMtgKeyPress = (e, courseId) => {
-        if (e.key === "Enter") addMeeting(courseId);
-      };
-
-      window.toggleMeeting = (courseId, meetingId) => {
-        const journal = appData.journals.find(
-          (j) => j.id === selectedJournalId,
-        );
-        const course = journal.courses.find((c) => c.id === courseId);
-        const meeting = course.meetings.find((m) => m.id === meetingId);
-
-        meeting.isCompleted = !meeting.isCompleted;
-        saveData();
-        renderTree();
-      };
-
-      window.editMeeting = (courseId, meetingId) => {
-        const journal = appData.journals.find(
-          (j) => j.id === selectedJournalId,
-        );
-        const course = journal.courses.find((c) => c.id === courseId);
-        const meeting = course.meetings.find((m) => m.id === meetingId);
-
-        const newTitle = prompt("Edit Nama Pertemuan:", meeting.title);
-        if (newTitle && newTitle.trim() !== "") {
-          meeting.title = newTitle.trim();
-          saveData();
-          renderTree();
-        }
-      };
-
-      window.deleteMeeting = (courseId, meetingId) => {
-        const journal = appData.journals.find(
-          (j) => j.id === selectedJournalId,
-        );
-        const course = journal.courses.find((c) => c.id === courseId);
-
-        journal.courses.find((c) => c.id === courseId).meetings =
-          course.meetings.filter((m) => m.id !== meetingId);
-        saveData();
-        renderTree();
-      };
-
-      // EXPORT & RESET
-      btnExport.onclick = () => {
-        const dataStr =
-          "data:text/json;charset=utf-8," +
-          encodeURIComponent(JSON.stringify(appData, null, 2));
-        const downloadAnchor = document.createElement("a");
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute(
-          "download",
-          `backup-jurnal-${Date.now()}.json`,
-        );
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-      };
-
-      btnReset.onclick = async () => {
-        if (
-          confirm(
-            "Reset semua data ke data awal server? Perubahan lokal akan hilang.",
-          )
-        ) {
-          localStorage.removeItem("kuliah_tree_app_data");
-          await fetchInitialJSON();
-          renderJournals();
-          if (selectedJournalId) renderTree();
-        }
+      window.toggleTask = (taskId) => {
+        userProgress[taskId] = !userProgress[taskId];
+        saveProgress();
+        renderTasks();
       };
 
       function escapeHtml(str) {
