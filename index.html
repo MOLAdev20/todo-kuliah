@@ -448,7 +448,7 @@
           } else if (course.sks === 3) {
             let mtgList = [];
             if (is3SksDouble) {
-              let baseMtg = (academicWeek / 2) * 3 - 1;
+              let baseMtg = (academicWeek / 2) * 3 - 1; // Contoh Pekan 2: Pertemuan 2 & 3
               mtgList.push(baseMtg, baseMtg + 1);
             } else {
               let baseMtg = Math.floor(academicWeek / 2) * 3 + 1;
@@ -466,9 +466,12 @@
                   isCompleted: !!userProgress[taskId],
                 };
 
-                if (is3SksDouble && idx === 0) {
+                // REVISI ATURAN 3 SKS PEKAN DOUBLE:
+                // Pertemuan Terakhir dari pasangannya (idx === 1) SELALU ONLINE
+                if (is3SksDouble && idx === 1) {
                   online.push(taskObj);
                 } else {
+                  // Pertemuan Pertama (idx === 0) ngikutin moda dasar matkul
                   if (isMeetingOnline(course, mtgNum)) online.push(taskObj);
                   else offline.push(taskObj);
                 }
